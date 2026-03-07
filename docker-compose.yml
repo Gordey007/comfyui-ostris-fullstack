@@ -1,0 +1,25 @@
+services:
+  comfyui_ostris_jupyter:
+    build: .
+    command: supervisord -c /etc/supervisor/inference.conf
+    ports:
+      - "8188:8188"   # ComfyUI
+      - "8675:8675"   # AI Toolkit UI
+      - "8888:8888"   # Jupyter
+    volumes:
+      - ./models:/workspace/models
+      - ./dataset:/workspace/dataset
+      - ./output:/workspace/output
+      - ./hf_cache:/workspace/huggingface
+      - ./torch_cache:/workspace/.cache/torch
+      - ./triton_cache:/workspace/.triton
+    environment:
+      HF_TOKEN: ${HF_TOKEN}
+      MODEL_URLS: >
+        https://huggingface.co/.../model.safetensors
+      MAX_GPU_MEMORY: 0.9
+      NVIDIA_VISIBLE_DEVICES: all
+      CUDA_VISIBLE_DEVICES: 0
+    gpus: all
+    restart: unless-stopped
+    
